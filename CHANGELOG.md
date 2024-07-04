@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/biclighter81/beer-tracker/compare/v1.1.1...v1.2.0) (2024-07-04)
+
+
+### Features
+
+* **pwa:** adds pwa support ([2241978](https://github.com/biclighter81/beer-tracker/commit/22419788a1cc18477fa6dbeee42cd37e92a78e73))
+
 ## [1.1.1](https://github.com/biclighter81/beer-tracker/compare/v1.1.0...v1.1.1) (2024-07-04)
 
 
