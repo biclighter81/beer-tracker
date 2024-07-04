@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/biclighter81/beer-tracker/compare/v1.1.0...v1.1.1) (2024-07-04)
+
+
+### Bug Fixes
+
+* **lint:** removes unused var ([b3f4d1c](https://github.com/biclighter81/beer-tracker/commit/b3f4d1c908a212cdb4d5f0b8d7f25e3e250eaf6f))
+
 # [1.1.0](https://github.com/biclighter81/beer-tracker/compare/v1.0.1...v1.1.0) (2024-07-04)
 
 
