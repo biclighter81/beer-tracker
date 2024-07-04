@@ -115,7 +115,7 @@ export default function Stats({ knownEans }: {
         const userWeight = 85; // or fetch from user profile
         const BAC = (consumedAlcohol / userWeight) * 10; // Convert to promille
 
-        return BAC.toFixed(2);
+        return BAC;
     }
     const getColorPalette = (numColors: number) => {
         const colors = [];
@@ -142,16 +142,23 @@ export default function Stats({ knownEans }: {
                 }
             })
             return acc
-        }, {} as Record<string, { time: number, promille: string }[]>)
+        }, {} as Record<string, { time: number, promille: number }[]>)
     }, [stats])
     const colors = getColorPalette(Object.keys(dayPromilleDatapoints).length);
-
+    const getPromilleColor = (promille: number) => {
+        if (promille < 1.2)
+            return 'bg-red-500'
+        else if (promille >= 1.2 && promille < 2)
+            return 'bg-yellow-500'
+        else if (promille >= 2)
+            return 'bg-green-500'
+    }
     const userPromille = useMemo(() => {
         const uniqueUsers = [...new Set(stats.map(item => item.username))]
         return uniqueUsers.reduce((acc, user) => {
             acc[user] = calculatePromille(user)
             return acc
-        }, {} as Record<string, string>)
+        }, {} as Record<string, number>)
     }, [stats])
     const [expanded, setExpanded] = useState(-1)
     useEffect(() => {
@@ -213,10 +220,10 @@ export default function Stats({ knownEans }: {
                             item == 'Users' && <div>
                                 {userStats.map((user, index) => {
                                     return <div key={index} className="border-b border-gray-200 py-4">
+                                        <div className={`text-2xl uppercase text-center font-bold text-white  px-4 py-[2px] rounded-lg marker mb-2 ${getPromilleColor(userPromille[user.user])}`}>{userPromille[user.user].toFixed(2)} Promille</div>
                                         <div className="flex justify-between items-center">
                                             <div className="text-lg font-semibold">{user.user}</div>
                                             <div className="flex space-x-2">
-                                                <div className="text-sm text-white bg-green-500 px-4 py-[2px] rounded-lg">{userPromille[user.user]} Promille</div>
                                                 <div className="text-sm text-white bg-yellow-500 px-4 py-[2px] rounded-lg">{user.count}x</div>
                                                 <div className="text-sm text-white bg-blue-500 px-4 py-[2px] rounded-lg">{
                                                     Object.keys(user.leader).reduce((acc, drink) => {
@@ -290,6 +297,6 @@ export default function Stats({ knownEans }: {
                 minute: '2-digit',
                 second: '2-digit'
             }).format(Date.now())}
-        </div>
+        </div >
     </>)
 }
