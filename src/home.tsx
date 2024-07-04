@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import Scanner from "./components/Scanner";
-import { IconDeviceFloppy } from "@tabler/icons-react";
+import { IconCheck, IconDeviceFloppy } from "@tabler/icons-react";
 export default function Home({ knownEans, setKnownEans }: {
     knownEans: {
         [key: string]: {
@@ -14,7 +14,7 @@ export default function Home({ knownEans, setKnownEans }: {
 }) {
     const [camera, setCamera] = useState(false);
     const [result, setResult] = useState(null);
-
+    const [savingUser, setSavingUser] = useState(false);
     const [username, setUsername] = useState("");
     const [newDrink, setNewDrink] = useState({
         name: "",
@@ -26,7 +26,13 @@ export default function Home({ knownEans, setKnownEans }: {
         setUsername(localStorage.getItem('username') ?? '')
     }, [])
 
-
+    useEffect(() => {
+        if (savingUser) {
+            setTimeout(() => {
+                setSavingUser(false)
+            }, 2000)
+        }
+    }, [savingUser])
 
     const onDetected = (res: any) => {
         if (result) return;
@@ -80,9 +86,12 @@ export default function Home({ knownEans, setKnownEans }: {
                                     : (
                                         <div>
                                             <h3 className="text-red-500 uppercase text-center font-semibold mb-2">Drink not found!<br />{result}</h3>
-                                            <input value={newDrink.name} onChange={(e) => setNewDrink({ ...newDrink, name: e.currentTarget.value })} placeholder={"Name"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black uppercase mb-4" />
-                                            <input value={newDrink.alcohol} type="number" onChange={(e) => setNewDrink({ ...newDrink, alcohol: Number(e.currentTarget.value) })} placeholder={"Alcohol in %"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black uppercase mb-4" />
-                                            <input value={newDrink.ml} type="number" onChange={(e) => setNewDrink({ ...newDrink, ml: Number(e.currentTarget.value) })} placeholder={"Milliliter"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black uppercase mb-4" />
+                                            <label className="text-sm uppercase font-semibold">Name</label>
+                                            <input value={newDrink.name} onChange={(e) => setNewDrink({ ...newDrink, name: e.currentTarget.value })} placeholder={"Name"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black mb-4" />
+                                            <label className="text-sm uppercase font-semibold">Alcohol in %</label>
+                                            <input value={newDrink.alcohol} type="number" onChange={(e) => setNewDrink({ ...newDrink, alcohol: Number(e.currentTarget.value) })} placeholder={"Alcohol in %"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black mb-4" />
+                                            <label className="text-sm uppercase font-semibold">Volume in ml</label>
+                                            <input value={newDrink.ml} type="number" onChange={(e) => setNewDrink({ ...newDrink, ml: Number(e.currentTarget.value) })} placeholder={"Milliliter"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black mb-4" />
                                         </div>
                                     )
                             }
@@ -112,16 +121,20 @@ export default function Home({ knownEans, setKnownEans }: {
                     </div>
                 </div>
             }
-            <div className="flex space-x-2">
-                <input value={username} onChange={(e) => setUsername(e.currentTarget.value)} placeholder={"Who are you?"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black uppercase mb-4" />
-                <button className="bg-blue-500 rounded-md px-4 py-2 text-white uppercase font-bold mb-4" onClick={() => {
-                    localStorage.setItem('username', username.toUpperCase())
-                }}>
-                    <IconDeviceFloppy size={24} />
-                </button>
+            <div className="flex flex-col">
+                <label className="text-sm uppercase font-semibold">Username</label>
+                <div className="flex space-x-2 mb-4">
+                    <input value={username} onChange={(e) => setUsername(e.currentTarget.value)} placeholder={"Who are you?"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black" />
+                    <button className="bg-blue-500 rounded-md px-4 py-3 text-white uppercase font-bold" onClick={() => {
+                        setSavingUser(true)
+                        localStorage.setItem('username', username)
+                    }}>
+                        {!savingUser ? <IconDeviceFloppy size={16} /> : <IconCheck size={16} />}
+                    </button>
+                </div>
             </div>
             <a href={"/stats"}>
-                <button className={`w-full bg-teal-500 rounded-md px-4 py-2 text-white uppercase font-bold mb-4`}>
+                <button className={`w-full bg-indigo-500 rounded-md px-4 py-2 text-white uppercase font-bold mb-4`}>
                     Show stats
                 </button>
             </a>

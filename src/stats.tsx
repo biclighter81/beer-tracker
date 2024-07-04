@@ -1,5 +1,25 @@
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react"
 import { useEffect, useMemo, useState } from "preact/hooks"
+import {
+    Chart,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js'
+Chart.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+)
+import { Line } from 'react-chartjs-2'
 
 export default function Stats({ knownEans }: {
     knownEans: {
@@ -62,34 +82,70 @@ export default function Stats({ knownEans }: {
         }
         )
     }, [stats])
-    const calculatePromille = (user: string) => {
-        const calculateBACAtTime = (time: number) => {
-            const timeInSeconds = time / 1000;
-            // Filter user's drinks consumed before the given time
-            const consumedDrinks = stats.filter(drink => drink.timestamp <= time && drink.username === user);
 
-            // Calculate total consumed alcohol based on timestamps
-            const consumedAlcohol = consumedDrinks.reduce((acc, drink) => {
-                const drinkObject = knownEans[drink.ean as keyof typeof knownEans];
-                if (drinkObject) {
-                    acc += drinkObject.alcohol * (drinkObject.ml / 1000);
-                }
-                return acc;
-            }, 0);
 
-            // Calculate time elapsed since last drink
-            const lastDrinkTime = consumedDrinks.length > 0 ? consumedDrinks[0].timestamp / 1000 : 0;
-            const elapsedTime = timeInSeconds - lastDrinkTime;
-            // Eliminate alcohol over time
-            const eliminatedAlcohol = Math.min(0.15, elapsedTime / 3600) * consumedAlcohol;
-            // Calculate BAC (promille in this case, conversion factor might be needed)
-            const BAC = Math.max(0, consumedAlcohol - eliminatedAlcohol) / 85 * 10; // Assuming weight in kg
-            return BAC.toFixed(2);
-        };
+    const calculatePromille = (user: string, time?: number) => {
+        const timeInSeconds = (time ?? Date.now()) / 1000;
+        const consumedDrinks = stats.filter(drink => drink.timestamp <= (time ?? Date.now()) && drink.username === user)
+            .sort((a, b) => a.timestamp - b.timestamp);
 
-        // Return a function to calculate BAC at any given time
-        return calculateBACAtTime(Date.now());
+        let consumedAlcohol = 0;
+        let lastDrinkTime = 0;
+
+        for (const drink of consumedDrinks) {
+            const drinkObject = knownEans[drink.ean as keyof typeof knownEans];
+            if (drinkObject) {
+                const alcoholContent = drinkObject.alcohol * (drinkObject.ml / 1000);
+                const drinkTimeInSeconds = drink.timestamp / 1000;
+                const elapsedTime = (timeInSeconds - drinkTimeInSeconds) / 3600; // in hours
+
+                // Calculate the eliminated alcohol for this drink
+                const eliminationRatePerHour = 0.015; // 0.015 per hour per kg of body weight
+                const userWeight = 85; // or fetch from user profile
+                const eliminatedAlcohol = eliminationRatePerHour * userWeight * elapsedTime;
+
+                consumedAlcohol += alcoholContent;
+                consumedAlcohol -= Math.min(eliminatedAlcohol, alcoholContent); // Ensure not to subtract more than available
+
+                lastDrinkTime = drinkTimeInSeconds;
+            }
+        }
+
+        // Calculate BAC (promille in this case, conversion factor might be needed)
+        const userWeight = 85; // or fetch from user profile
+        const BAC = (consumedAlcohol / userWeight) * 10; // Convert to promille
+
+        return BAC.toFixed(2);
     }
+    const getColorPalette = (numColors: number) => {
+        const colors = [];
+        for (let i = 0; i < numColors; i++) {
+            const hue = (i * 360 / numColors) % 360;
+            colors.push(`hsl(${hue}, 100%, 50%)`);
+        }
+        return colors;
+    };
+    const dayPromilleDatapoints = useMemo(() => {
+        //generte 24 hours of promille data
+        const datapoints = Array.from({ length: 48 }, (_, i) => {
+            const time = Date.now() - i * 1800000
+            return {
+                time,
+            }
+        })
+        const uniqueUsers = [...new Set(stats.map(item => item.username))]
+        return uniqueUsers.reduce((acc, user) => {
+            acc[user] = datapoints.map((datapoint) => {
+                return {
+                    time: datapoint.time,
+                    promille: calculatePromille(user, datapoint.time)
+                }
+            })
+            return acc
+        }, {} as Record<string, { time: number, promille: string }[]>)
+    }, [stats])
+    const colors = getColorPalette(Object.keys(dayPromilleDatapoints).length);
+
     const userPromille = useMemo(() => {
         const uniqueUsers = [...new Set(stats.map(item => item.username))]
         return uniqueUsers.reduce((acc, user) => {
@@ -104,6 +160,11 @@ export default function Stats({ knownEans }: {
         })
     }, [])
     return (<>
+        <div className="w-full px-4 py-4">
+            <a href={'/'}>
+                <button className="bg-blue-500 w-full px-4 py-4 text-white font-bold uppercase rounded-md">Back to drinking!</button>
+            </a>
+        </div>
         <div className="flex flex-col rounded-md space-y-4 px-4">
             {categories.map((item, index) => {
                 return <div key={index} className="border-b border-gray-200 cursor-pointer">
@@ -121,7 +182,7 @@ export default function Stats({ knownEans }: {
                             }
                         </div>
                     </div>
-                    <div className={`text-justify text-sm text-basetext px-4 overflow-hidden transition-all ease-in-out duration-300 ${expanded == index ? ' max-h-[400px] px-4 py-4' : 'max-h-0'}`}>
+                    <div className={`text-justify text-sm text-basetext px-4 overflow-hidden transition-all ease-in-out duration-300 ${expanded == index ? ' max-h-[400px] overflow-y-auto px-4 py-4' : 'max-h-0'}`}>
                         {
                             item == 'Drinks' && <div>
                                 {drinkStats.map((drink, index) => {
@@ -129,8 +190,8 @@ export default function Stats({ knownEans }: {
                                         <div className="flex justify-between items-center">
                                             <div className="text-lg font-semibold">{drink.drinkObj?.name ?? drink.drink}</div>
                                             <div className="flex space-x-2">
-                                                <div className="text-sm text-basetext bg-yellow-500 px-4 py-[2px] rounded-lg">{drink.count}x</div>
-                                                <div className="text-sm text-basetext bg-blue-500 px-4 py-[2px] rounded-lg">{drink.count * ((drink.drinkObj?.ml ?? 0) / 1000)} Liter Total</div>
+                                                <div className="text-sm text-white bg-yellow-500 px-4 py-[2px] rounded-lg">{drink.count}x</div>
+                                                <div className="text-sm text-white bg-blue-500 px-4 py-[2px] rounded-lg">{(drink.count * ((drink.drinkObj?.ml ?? 0) / 1000)).toFixed(2)} Liter Total</div>
                                             </div>
                                         </div>
                                         <div className="text-sm text-basetext">
@@ -155,13 +216,13 @@ export default function Stats({ knownEans }: {
                                         <div className="flex justify-between items-center">
                                             <div className="text-lg font-semibold">{user.user}</div>
                                             <div className="flex space-x-2">
-                                                <div className="text-sm text-basetext bg-green-500 px-4 py-[2px] rounded-lg">{userPromille[user.user]} Promille</div>
-                                                <div className="text-sm text-basetext bg-yellow-500 px-4 py-[2px] rounded-lg">{user.count}x</div>
-                                                <div className="text-sm text-basetext bg-blue-500 px-4 py-[2px] rounded-lg">{
+                                                <div className="text-sm text-white bg-green-500 px-4 py-[2px] rounded-lg">{userPromille[user.user]} Promille</div>
+                                                <div className="text-sm text-white bg-yellow-500 px-4 py-[2px] rounded-lg">{user.count}x</div>
+                                                <div className="text-sm text-white bg-blue-500 px-4 py-[2px] rounded-lg">{
                                                     Object.keys(user.leader).reduce((acc, drink) => {
                                                         acc += user.leader[drink] * (knownEans[drink as keyof typeof knownEans]?.ml ?? 0) / 1000
                                                         return acc
-                                                    }, 0)
+                                                    }, 0).toFixed(2)
                                                 } Liter Total</div>
                                             </div>
                                         </div>
@@ -197,6 +258,38 @@ export default function Stats({ knownEans }: {
                 </div>
             }
             )}
+            <div>
+                <Line
+                    data={{
+                        labels: dayPromilleDatapoints[Object.keys(dayPromilleDatapoints)[0]]?.map((item) => new Date(item.time).toLocaleTimeString()).reverse() ?? [],
+                        datasets: Object.keys(dayPromilleDatapoints).map((user, idx) => {
+                            return {
+                                label: user,
+                                data: dayPromilleDatapoints[user].map((item) => item.promille).reverse(),
+                                fill: false,
+                                backgroundColor: colors[idx],
+                                borderColor: colors[idx],
+                                tension: 0.4,
+                            }
+                        })
+                    }}
+                    options={{
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }}
+                />
+            </div>
+            {new Intl.DateTimeFormat('de-DE', {
+                year: 'numeric',
+                month: 'long',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }).format(Date.now())}
         </div>
     </>)
 }
