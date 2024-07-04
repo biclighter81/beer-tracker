@@ -98,7 +98,7 @@ export default function Stats({ knownEans }: {
                 const elapsedTime = (timeInSeconds - drinkTimeInSeconds) / 3600; // in hours
 
                 // Calculate the eliminated alcohol for this drink
-                const eliminationRatePerHour = 0.015; // 0.015 per hour per kg of body weight
+                const eliminationRatePerHour = 0.01; // 0.015 per hour per kg of body weight
                 const userWeight = 85; // or fetch from user profile
                 const eliminatedAlcohol = eliminationRatePerHour * userWeight * elapsedTime;
 
@@ -142,11 +142,11 @@ export default function Stats({ knownEans }: {
     }, [stats])
     const colors = getColorPalette(Object.keys(dayPromilleDatapoints).length);
     const getPromilleColor = (promille: number) => {
-        if (promille < 1.2)
+        if (promille < 0.5)
             return 'bg-red-500'
-        else if (promille >= 1.2 && promille < 2)
+        else if (promille >= 0.5 && promille < 1)
             return 'bg-yellow-500'
-        else if (promille >= 2)
+        else if (promille >= 1)
             return 'bg-green-500'
     }
     const userPromille = useMemo(() => {
@@ -193,7 +193,7 @@ export default function Stats({ knownEans }: {
                                         <div className="flex justify-between items-center">
                                             <div className="text-lg font-semibold">{drink.drinkObj?.name ?? drink.drink}</div>
                                             <div className="flex space-x-2">
-                                                <div className="text-sm text-white bg-yellow-500 px-4 py-[2px] rounded-lg">{drink.count}x</div>
+                                                <div className="text-sm text-white bg-purple-500 px-4 py-[2px] rounded-lg">{drink.count}x</div>
                                                 <div className="text-sm text-white bg-blue-500 px-4 py-[2px] rounded-lg">{(drink.count * ((drink.drinkObj?.ml ?? 0) / 1000)).toFixed(2)} Liter Total</div>
                                             </div>
                                         </div>
@@ -220,7 +220,7 @@ export default function Stats({ knownEans }: {
                                         <div className="flex justify-between items-center">
                                             <div className="text-lg font-semibold">{user.user}</div>
                                             <div className="flex space-x-2">
-                                                <div className="text-sm text-white bg-yellow-500 px-4 py-[2px] rounded-lg">{user.count}x</div>
+                                                <div className="text-sm text-white bg-purple-500 px-4 py-[2px] rounded-lg">{user.count}x</div>
                                                 <div className="text-sm text-white bg-blue-500 px-4 py-[2px] rounded-lg">{
                                                     Object.keys(user.leader).reduce((acc, drink) => {
                                                         acc += user.leader[drink] * (knownEans[drink as keyof typeof knownEans]?.ml ?? 0) / 1000
@@ -269,7 +269,6 @@ export default function Stats({ knownEans }: {
                             return {
                                 label: user,
                                 data: dayPromilleDatapoints[user].map((item) => item.promille).reverse(),
-                                fill: false,
                                 backgroundColor: colors[idx],
                                 borderColor: colors[idx],
                                 tension: 0.4,
@@ -277,6 +276,7 @@ export default function Stats({ knownEans }: {
                         })
                     }}
                     options={{
+
                         scales: {
                             y: {
                                 beginAtZero: true

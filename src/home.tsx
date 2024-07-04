@@ -89,9 +89,26 @@ export default function Home({ knownEans, setKnownEans }: {
                                             <label className="text-sm uppercase font-semibold">Name</label>
                                             <input value={newDrink.name} onChange={(e) => setNewDrink({ ...newDrink, name: e.currentTarget.value })} placeholder={"Name"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black mb-4" />
                                             <label className="text-sm uppercase font-semibold">Alcohol in %</label>
-                                            <input value={newDrink.alcohol} type="number" onChange={(e) => setNewDrink({ ...newDrink, alcohol: Number(e.currentTarget.value) })} placeholder={"Alcohol in %"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black mb-4" />
+                                            <select value={newDrink.alcohol} type="number" onChange={(e) => setNewDrink({ ...newDrink, alcohol: Number(e.currentTarget.value) })} placeholder={"Alcohol in %"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black mb-4">
+                                                <option value={0}>0%</option>
+                                                <option value={2.5}>2.5%</option>
+                                                <option value={5}>5%</option>
+                                                <option value={6}>6%</option>
+                                                <option value={10}>10%</option>
+                                                <option value={20}>20%</option>
+                                                <option value={38}>38%</option>
+                                            </select>
                                             <label className="text-sm uppercase font-semibold">Volume in ml</label>
-                                            <input value={newDrink.ml} type="number" onChange={(e) => setNewDrink({ ...newDrink, ml: Number(e.currentTarget.value) })} placeholder={"Milliliter"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black mb-4" />
+                                            <select value={newDrink.ml} type="number" onChange={(e) => setNewDrink({ ...newDrink, ml: Number(e.currentTarget.value) })} placeholder={"Milliliter"} className="w-full bg-gray-200 border border-gray-300 rounded-md px-4 py-2 text-black mb-4">
+                                                <option value={20}>20ml</option>
+                                                <option value={40}>40ml</option>
+                                                <option value={200}>200ml</option>
+                                                <option value={250}>250ml</option>
+                                                <option value={330}>330ml</option>
+                                                <option value={500}>500ml</option>
+                                                <option value={750}>750ml</option>
+                                                <option value={1000}>1000ml</option>
+                                            </select>
                                         </div>
                                     )
                             }
