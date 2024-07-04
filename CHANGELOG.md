@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/biclighter81/beer-tracker/compare/v1.3.1...v1.3.2) (2024-07-04)
+
+
+### Bug Fixes
+
+* **pwa:** should resolve cache info ([6c01e96](https://github.com/biclighter81/beer-tracker/commit/6c01e96feb3395bc8a2d44be14dd364c345b2f20))
+
 ## [1.3.1](https://github.com/biclighter81/beer-tracker/compare/v1.3.0...v1.3.1) (2024-07-04)
 
 
