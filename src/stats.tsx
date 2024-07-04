@@ -90,8 +90,6 @@ export default function Stats({ knownEans }: {
             .sort((a, b) => a.timestamp - b.timestamp);
 
         let consumedAlcohol = 0;
-        let lastDrinkTime;
-
         for (const drink of consumedDrinks) {
             const drinkObject = knownEans[drink.ean as keyof typeof knownEans];
             if (drinkObject) {
@@ -106,8 +104,6 @@ export default function Stats({ knownEans }: {
 
                 consumedAlcohol += alcoholContent;
                 consumedAlcohol -= Math.min(eliminatedAlcohol, alcoholContent); // Ensure not to subtract more than available
-
-                lastDrinkTime = drinkTimeInSeconds;
             }
         }
 
