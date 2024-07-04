@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/biclighter81/beer-tracker/compare/v1.2.0...v1.3.0) (2024-07-04)
+
+
+### Features
+
+* **meta:** adds favicon and title ([4ead146](https://github.com/biclighter81/beer-tracker/commit/4ead14696384c8c83990e2c59de98e9b8a084e6b))
+
 # [1.2.0](https://github.com/biclighter81/beer-tracker/compare/v1.1.1...v1.2.0) (2024-07-04)
 
 
