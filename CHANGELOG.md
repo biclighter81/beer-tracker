@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/biclighter81/beer-tracker/compare/v1.0.1...v1.1.0) (2024-07-04)
+
+
+### Features
+
+* **ui:** adds colors for promille value ([77d6a07](https://github.com/biclighter81/beer-tracker/commit/77d6a070b7c7c31ab532bcc1c0148b4420115ba0))
+
 ## [1.0.1](https://github.com/biclighter81/beer-tracker/compare/v1.0.0...v1.0.1) (2024-07-04)
 
 
