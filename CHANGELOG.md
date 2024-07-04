@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/biclighter81/beer-tracker/compare/v1.0.0...v1.0.1) (2024-07-04)
+
+
+### Bug Fixes
+
+* **bac:** fixes bac calculation ([9e93d82](https://github.com/biclighter81/beer-tracker/commit/9e93d827bb0ae8ac42ad1f21c48e3b299842d41b))
+
 # 1.0.0 (2024-07-03)
 
 
