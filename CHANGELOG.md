@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/biclighter81/beer-tracker/compare/v1.3.0...v1.3.1) (2024-07-04)
+
+
+### Bug Fixes
+
+* **ui:** dropdown options and stat mapping ([8033db3](https://github.com/biclighter81/beer-tracker/commit/8033db3351937b0e7903b8ab32efa790a68a9a7e))
+
 # [1.3.0](https://github.com/biclighter81/beer-tracker/compare/v1.2.0...v1.3.0) (2024-07-04)
 
 
