@@ -8,9 +8,7 @@ export default defineConfig({
     preact(),
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: {
-        enabled: true,
-      },
+      selfDestroying: true,
       manifest: {
         name: 'Beer Tracker',
         short_name: 'Beer Tracker',
